@@ -1,40 +1,40 @@
 /*****************************************************************************
-*
-* Copyright (c) 2000 - 2019, Lawrence Livermore National Security, LLC
-* Produced at the Lawrence Livermore National Laboratory
-* LLNL-CODE-442911
-* All rights reserved.
-*
-* This file is  part of VisIt. For  details, see https://visit.llnl.gov/.  The
-* full copyright notice is contained in the file COPYRIGHT located at the root
-* of the VisIt distribution or at http://www.llnl.gov/visit/copyright.html.
-*
-* Redistribution  and  use  in  source  and  binary  forms,  with  or  without
-* modification, are permitted provided that the following conditions are met:
-*
-*  - Redistributions of  source code must  retain the above  copyright notice,
-*    this list of conditions and the disclaimer below.
-*  - Redistributions in binary form must reproduce the above copyright notice,
-*    this  list of  conditions  and  the  disclaimer (as noted below)  in  the
-*    documentation and/or other materials provided with the distribution.
-*  - Neither the name of  the LLNS/LLNL nor the names of  its contributors may
-*    be used to endorse or promote products derived from this software without
-*    specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT  HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR  IMPLIED WARRANTIES, INCLUDING,  BUT NOT  LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND  FITNESS FOR A PARTICULAR  PURPOSE
-* ARE  DISCLAIMED. IN  NO EVENT  SHALL LAWRENCE  LIVERMORE NATIONAL  SECURITY,
-* LLC, THE  U.S.  DEPARTMENT OF  ENERGY  OR  CONTRIBUTORS BE  LIABLE  FOR  ANY
-* DIRECT,  INDIRECT,   INCIDENTAL,   SPECIAL,   EXEMPLARY,  OR   CONSEQUENTIAL
-* DAMAGES (INCLUDING, BUT NOT  LIMITED TO, PROCUREMENT OF  SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF  USE, DATA, OR PROFITS; OR  BUSINESS INTERRUPTION) HOWEVER
-* CAUSED  AND  ON  ANY  THEORY  OF  LIABILITY,  WHETHER  IN  CONTRACT,  STRICT
-* LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)  ARISING IN ANY  WAY
-* OUT OF THE  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-* DAMAGE.
-*
-*****************************************************************************/
+ *
+ * Copyright (c) 2000 - 2019, Lawrence Livermore National Security, LLC
+ * Produced at the Lawrence Livermore National Laboratory
+ * LLNL-CODE-442911
+ * All rights reserved.
+ *
+ * This file is  part of VisIt. For  details, see https://visit.llnl.gov/.  The
+ * full copyright notice is contained in the file COPYRIGHT located at the root
+ * of the VisIt distribution or at http://www.llnl.gov/visit/copyright.html.
+ *
+ * Redistribution  and  use  in  source  and  binary  forms,  with  or  without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  - Redistributions of  source code must  retain the above  copyright notice,
+ *    this list of conditions and the disclaimer below.
+ *  - Redistributions in binary form must reproduce the above copyright notice,
+ *    this  list of  conditions  and  the  disclaimer (as noted below)  in  the
+ *    documentation and/or other materials provided with the distribution.
+ *  - Neither the name of  the LLNS/LLNL nor the names of  its contributors may
+ *    be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT  HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR  IMPLIED WARRANTIES, INCLUDING,  BUT NOT  LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND  FITNESS FOR A PARTICULAR  PURPOSE
+ * ARE  DISCLAIMED. IN  NO EVENT  SHALL LAWRENCE  LIVERMORE NATIONAL  SECURITY,
+ * LLC, THE  U.S.  DEPARTMENT OF  ENERGY  OR  CONTRIBUTORS BE  LIABLE  FOR  ANY
+ * DIRECT,  INDIRECT,   INCIDENTAL,   SPECIAL,   EXEMPLARY,  OR   CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT  LIMITED TO, PROCUREMENT OF  SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF  USE, DATA, OR PROFITS; OR  BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED  AND  ON  ANY  THEORY  OF  LIABILITY,  WHETHER  IN  CONTRACT,  STRICT
+ * LIABILITY, OR TORT  (INCLUDING NEGLIGENCE OR OTHERWISE)  ARISING IN ANY  WAY
+ * OUT OF THE  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *****************************************************************************/
 
 // ************************************************************************* //
 //                            avtGMSHFileFormat.C                           //
@@ -68,22 +68,22 @@
 
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
         return !std::isspace(ch);
-    }));
+      }));
 }
 
 // trim from end (in place)
 static inline void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
         return !std::isspace(ch);
-    }).base(), s.end());
+      }).base(), s.end());
 }
 
 // trim from both ends (in place)
 static inline void trim(std::string &s) {
-    ltrim(s);
-    rtrim(s);
+  ltrim(s);
+  rtrim(s);
 }
 
 std::vector<std::string> split(std::string s)
@@ -104,24 +104,23 @@ std::vector<std::string> split(std::string s)
 // ****************************************************************************
 
 avtGMSHFileFormat::avtGMSHFileFormat(const char *filename)
-    : avtSTSDFileFormat(filename)
+: avtSTSDFileFormat(filename)
 {
-    std::ifstream ins(filename);
-    if (!ins) {
-        EXCEPTION1(InvalidDBTypeException, "Can't open file.");
-    }
+  m_filename = filename;
+  std::ifstream ins(filename);
+  if (!ins) {
+    EXCEPTION1(InvalidDBTypeException, "Can't open file.");
+  }
 
-    std::string line;
-    while (std::getline(ins, line)) {
-        trim(line);
-        m_data.push_back(line);
-    }
+  std::string line;
+  std::getline(ins, line);
+  trim(line);
 
-    // TODO:
-    // Vérifier la version du format de fichier.
-    // Le reader ne supporte que les fichiers GMSH v2.X ASCII.
+  // TODO:
+  // Vérifier la version du format de fichier.
+  // Le reader ne supporte que les fichiers GMSH v2.X ASCII.
     
-    ins.close();
+  ins.close();
 }
 
 // ****************************************************************************
@@ -159,41 +158,41 @@ avtGMSHFileFormat::FreeUpResources(void)
 void
 avtGMSHFileFormat::PopulateDatabaseMetaData(avtDatabaseMetaData *md)
 {
-    //
-    // CODE TO ADD A MESH
-    //
-    // string meshname = ...
-    //
-    // AVT_RECTILINEAR_MESH, AVT_CURVILINEAR_MESH, AVT_UNSTRUCTURED_MESH,
-    // AVT_POINT_MESH, AVT_SURFACE_MESH, AVT_UNKNOWN_MESH
-    // avtMeshType mt = AVT_RECTILINEAR_MESH;
-    //
-    // int nblocks = 1;  <-- this must be 1 for STSD
-    // int block_origin = 0;
-    // int spatial_dimension = 2;
-    // int topological_dimension = 2;
-    // double *extents = NULL;
-    //
-    // Here's the call that tells the meta-data object that we have a mesh:
-    //
-    // AddMeshToMetaData(md, meshname, mt, extents, nblocks, block_origin,
-    //                   spatial_dimension, topological_dimension);
-    //
+  //
+  // CODE TO ADD A MESH
+  //
+  // string meshname = ...
+  //
+  // AVT_RECTILINEAR_MESH, AVT_CURVILINEAR_MESH, AVT_UNSTRUCTURED_MESH,
+  // AVT_POINT_MESH, AVT_SURFACE_MESH, AVT_UNKNOWN_MESH
+  // avtMeshType mt = AVT_RECTILINEAR_MESH;
+  //
+  // int nblocks = 1;  <-- this must be 1 for STSD
+  // int block_origin = 0;
+  // int spatial_dimension = 2;
+  // int topological_dimension = 2;
+  // double *extents = NULL;
+  //
+  // Here's the call that tells the meta-data object that we have a mesh:
+  //
+  // AddMeshToMetaData(md, meshname, mt, extents, nblocks, block_origin,
+  //                   spatial_dimension, topological_dimension);
+  //
 
-    //
-    // CODE TO ADD A SCALAR VARIABLE
-    //
-    // string mesh_for_this_var = meshname; // ??? -- could be multiple meshes
-    // string varname = ...
-    //
-    // AVT_NODECENT, AVT_ZONECENT, AVT_UNKNOWN_CENT
-    // avtCentering cent = AVT_NODECENT;
-    //
-    //
-    // Here's the call that tells the meta-data object that we have a var:
-    //
-    // AddScalarVarToMetaData(md, varname, mesh_for_this_var, cent);
-    //
+  //
+  // CODE TO ADD A SCALAR VARIABLE
+  //
+  // string mesh_for_this_var = meshname; // ??? -- could be multiple meshes
+  // string varname = ...
+  //
+  // AVT_NODECENT, AVT_ZONECENT, AVT_UNKNOWN_CENT
+  // avtCentering cent = AVT_NODECENT;
+  //
+  //
+  // Here's the call that tells the meta-data object that we have a var:
+  //
+  // AddScalarVarToMetaData(md, varname, mesh_for_this_var, cent);
+  //
 }
 
 
@@ -217,23 +216,36 @@ avtGMSHFileFormat::PopulateDatabaseMetaData(avtDatabaseMetaData *md)
 vtkDataSet *
 avtGMSHFileFormat::GetMesh(const char *meshname)
 {
-    // TODO:
-    // Lire les coordonnées des noeuds (entre les balises $Nodes et $EndNodes).
-    // Puis utiliser la structure de données VTK appropriée pour les stocker.
+  std::ifstream ins(m_filename);
+  if (!ins) {
+    EXCEPTION1(InvalidDBTypeException, "Can't open file.");
+  }
 
-    // TODO:
-    // Initialiser un maillage non structuré à partir de cette dernière structure.
-    
-    // TODO:
-    // Lire les éléments (triangles et tetrahèdres) entre les balises $Elements et $EndElements.
+  std::string line;
+  while (std::getline(ins, line)) {
+    trim(line);
+    m_data.push_back(line);
+  }
 
-    // TODO:
-    // Allouer l'espace mémoire utilisé par le maillage en fonction du nombre de cellules.
-
-    // TODO:
-    // Utiliser la structure de données VTK appropriée pour stocker les éléments du maillage.
+  ins.close();
   
-    return nullptr;
+  // TODO:
+  // Lire les coordonnées des noeuds (entre les balises $Nodes et $EndNodes).
+  // Puis utiliser la structure de données VTK appropriée pour les stocker.
+
+  // TODO:
+  // Initialiser un maillage non structuré à partir de cette dernière structure.
+    
+  // TODO:
+  // Lire les éléments (triangles et tetrahèdres) entre les balises $Elements et $EndElements.
+
+  // TODO:
+  // Allouer l'espace mémoire utilisé par le maillage en fonction du nombre de cellules.
+
+  // TODO:
+  // Utiliser la structure de données VTK appropriée pour stocker les éléments du maillage.
+  
+  return nullptr;
 }
 
 // ****************************************************************************
@@ -257,27 +269,27 @@ avtGMSHFileFormat::GetVar(const char *varname)
 {
   return nullptr;
 
-    //
-    // If you have a file format where variables don't apply (for example a
-    // strictly polygonal format like the STL (Stereo Lithography) format,
-    // then uncomment the code below.
-    //
-    // EXCEPTION1(InvalidVariableException, varname);
-    //
+  //
+  // If you have a file format where variables don't apply (for example a
+  // strictly polygonal format like the STL (Stereo Lithography) format,
+  // then uncomment the code below.
+  //
+  // EXCEPTION1(InvalidVariableException, varname);
+  //
 
-    //
-    // If you do have a scalar variable, here is some code that may be helpful.
-    //
-    // int ntuples = XXX; // this is the number of entries in the variable.
-    // vtkFloatArray *rv = vtkFloatArray::New();
-    // rv->SetNumberOfTuples(ntuples);
-    // for (int i = 0 ; i < ntuples ; i++)
-    // {
-    //      rv->SetTuple1(i, VAL);  // you must determine value for ith entry.
-    // }
-    //
-    // return rv;
-    //
+  //
+  // If you do have a scalar variable, here is some code that may be helpful.
+  //
+  // int ntuples = XXX; // this is the number of entries in the variable.
+  // vtkFloatArray *rv = vtkFloatArray::New();
+  // rv->SetNumberOfTuples(ntuples);
+  // for (int i = 0 ; i < ntuples ; i++)
+  // {
+  //      rv->SetTuple1(i, VAL);  // you must determine value for ith entry.
+  // }
+  //
+  // return rv;
+  //
 }
 
 
@@ -302,35 +314,35 @@ avtGMSHFileFormat::GetVectorVar(const char *varname)
 {
   return nullptr;
   
-    //
-    // If you have a file format where variables don't apply (for example a
-    // strictly polygonal format like the STL (Stereo Lithography) format,
-    // then uncomment the code below.
-    //
-    // EXCEPTION1(InvalidVariableException, varname);
-    //
+  //
+  // If you have a file format where variables don't apply (for example a
+  // strictly polygonal format like the STL (Stereo Lithography) format,
+  // then uncomment the code below.
+  //
+  // EXCEPTION1(InvalidVariableException, varname);
+  //
 
-    //
-    // If you do have a vector variable, here is some code that may be helpful.
-    //
-    // int ncomps = YYY;  // This is the rank of the vector - typically 2 or 3.
-    // int ntuples = XXX; // this is the number of entries in the variable.
-    // vtkFloatArray *rv = vtkFloatArray::New();
-    // int ucomps = (ncomps == 2 ? 3 : ncomps);
-    // rv->SetNumberOfComponents(ucomps);
-    // rv->SetNumberOfTuples(ntuples);
-    // float *one_entry = new float[ucomps];
-    // for (int i = 0 ; i < ntuples ; i++)
-    // {
-    //      int j;
-    //      for (j = 0 ; j < ncomps ; j++)
-    //           one_entry[j] = ...
-    //      for (j = ncomps ; j < ucomps ; j++)
-    //           one_entry[j] = 0.;
-    //      rv->SetTuple(i, one_entry); 
-    // }
-    //
-    // delete [] one_entry;
-    // return rv;
-    //
+  //
+  // If you do have a vector variable, here is some code that may be helpful.
+  //
+  // int ncomps = YYY;  // This is the rank of the vector - typically 2 or 3.
+  // int ntuples = XXX; // this is the number of entries in the variable.
+  // vtkFloatArray *rv = vtkFloatArray::New();
+  // int ucomps = (ncomps == 2 ? 3 : ncomps);
+  // rv->SetNumberOfComponents(ucomps);
+  // rv->SetNumberOfTuples(ntuples);
+  // float *one_entry = new float[ucomps];
+  // for (int i = 0 ; i < ntuples ; i++)
+  // {
+  //      int j;
+  //      for (j = 0 ; j < ncomps ; j++)
+  //           one_entry[j] = ...
+  //      for (j = ncomps ; j < ucomps ; j++)
+  //           one_entry[j] = 0.;
+  //      rv->SetTuple(i, one_entry); 
+  // }
+  //
+  // delete [] one_entry;
+  // return rv;
+  //
 }
