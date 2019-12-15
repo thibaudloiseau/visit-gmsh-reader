@@ -115,11 +115,22 @@ avtGMSHFileFormat::avtGMSHFileFormat(const char *filename)
   std::string line;
   std::getline(ins, line);
   trim(line);
+  if (line != "$MeshFormat") {
+    EXCEPTION1(InvalidDBTypeException, "File must start with $MeshFormat.");
+  }
 
-  // TODO:
-  // Vérifier la version du format de fichier.
-  // Le reader ne supporte que les fichiers GMSH v2.X ASCII.
-    
+  std::getline(ins, line);
+  trim(line);
+  std::vector<std::string> version_line = split(line);
+  std::string version = version_line[0];
+  int file_type = std::stoi(version_line[1]);
+
+  if ((version.rfind("2.", 0) == 0) and (file_type == 0)) {
+    debug4 << "GMSH ASCII file version " << version << "\n";
+  } else {
+    EXCEPTION1(InvalidDBTypeException, "File version unsupported by this reader.");
+  }
+
   ins.close();
 }
 
@@ -231,6 +242,22 @@ avtGMSHFileFormat::GetMesh(const char *meshname)
   
   // TODO:
   // Lire les coordonnées des noeuds (entre les balises $Nodes et $EndNodes).
+  std::vector<std::string>::iterator nodes_start_it = std::find(m_data.begin(), m_data.end(), "$Nodes");
+  int nodes_index = std::distance(m_data.begin(), nodes_start_it);
+  int nnodes = std::stoi(m_data[nodes_index + 1]);
+  int nodes_start_index = nodes_index + 2;
+  std::vector<std::string>::iterator nodes_end_it = std::find(m_data.begin(), m_data.end(), "$EndNodes");
+  int nodes_end_index = std::distance(m_data.begin(), nodes_end_it);
+
+  std::vector<double> x, y, z;
+  for (int i = nodes_start_index; i < nodes_end_index; ++i) {
+    std::vector<std::string> toks_vertices = split(m_data[i]);
+    x.push_back(std::stod(toks_vertices[1]));
+    y.push_back(std::stod(toks_vertices[2]));
+    z.push_back(std::stod(toks_vertices[3]));
+  }
+
+  // TODO:
   // Puis utiliser la structure de données VTK appropriée pour les stocker.
 
   // TODO:
@@ -238,7 +265,38 @@ avtGMSHFileFormat::GetMesh(const char *meshname)
     
   // TODO:
   // Lire les éléments (triangles et tetrahèdres) entre les balises $Elements et $EndElements.
+  std::vector<std::string>::iterator elements_start_it =
+    std::find(m_data.begin(), m_data.end(), "$Elements");
+  int elements_index = std::distance(m_data.begin(), elements_start_it);
+  int elements_data_start_index = elements_index + 2;
+  std::vector<std::string>::iterator elements_end_it = std::find(m_data.begin(), m_data.end(), "$EndElements");
+  int elements_end_index = std::distance(m_data.begin(), elements_end_it);
 
+  // elements_data : element_id, cell_ids, ...
+  std::vector<std::vector<int>> elements_data;
+  
+  for (int i = elements_data_start_index; i < elements_end_index; ++i) {
+    std::vector<std::string> toks_elms = split(m_data[i]);
+    // Ajout des triangles et tetrahedres.
+    std::vector<int> elm;
+    int nb = toks_elms.size();
+
+    if (toks_elms[1] == "2") {
+      elm.push_back(2);
+      elm.push_back(std::stoi(toks_elms[nb-3])-1);
+      elm.push_back(std::stoi(toks_elms[nb-2])-1);
+      elm.push_back(std::stoi(toks_elms[nb-1])-1);
+      elements_data.push_back(elm);
+    } else if (toks_elms[1] == "4") {
+      elm.push_back(4);
+      elm.push_back(std::stoi(toks_elms[nb-4])-1);
+      elm.push_back(std::stoi(toks_elms[nb-3])-1);
+      elm.push_back(std::stoi(toks_elms[nb-2])-1);
+      elm.push_back(std::stoi(toks_elms[nb-1])-1);
+      elements_data.push_back(elm);
+    }
+  }
+  
   // TODO:
   // Allouer l'espace mémoire utilisé par le maillage en fonction du nombre de cellules.
 
